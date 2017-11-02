@@ -1,0 +1,55 @@
+[
+  {
+    "id": 0,
+    "name": "Challah",
+    "ingredients": [
+      {
+        "name": "eggs",
+        "amount": 2,
+        "unit": null
+      }
+    ]
+  },
+  {
+    "id": 1,
+    "name": "Sourdough",
+    "ingredients": [
+      {
+        "name": "flour",
+        "amount": 500,
+        "unit": "grams"
+      },
+      {
+        "name": "water",
+        "amount": 400,
+        "unit": "grams"
+      },
+      {
+        "name": "salt",
+        "amount": 10,
+        "unit": "grams"
+      }
+    ]
+  },
+  {
+    "name": "Ice Cream",
+    "ingredients": [
+      {
+        "name": "water",
+        "amount": 500,
+        "unit": "grams"
+      },
+      {
+        "name": "chocolate",
+        "amount": 400,
+        "unit": "grams"
+      },
+      {
+        "name": "peanut butter",
+        "amount": 100,
+        "unit": "grams"
+      }
+    ],
+    "id": 2
+  }
+]
