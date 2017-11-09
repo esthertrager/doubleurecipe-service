@@ -5,7 +5,7 @@
     "ingredients": [
       {
         "name": "eggs",
-        "amount": 2,
+        "amount": "3",
         "unit": null
       }
     ]
@@ -26,7 +26,7 @@
       },
       {
         "name": "salt",
-        "amount": 10,
+        "amount": "100",
         "unit": "grams"
       }
     ]
@@ -35,21 +35,32 @@
     "name": "Ice Cream",
     "ingredients": [
       {
-        "name": "water",
-        "amount": 500,
-        "unit": "grams"
+        "amount": "400",
+        "unit": "g",
+        "name": "peanut butter"
       },
       {
-        "name": "chocolate",
-        "amount": 400,
-        "unit": "grams"
-      },
-      {
-        "name": "peanut butter",
-        "amount": 100,
-        "unit": "grams"
+        "amount": "400",
+        "unit": "g",
+        "name": "dark chocolate"
       }
     ],
     "id": 2
+  },
+  {
+    "name": "Pancakes",
+    "ingredients": [
+      {
+        "amount": "200",
+        "unit": "g",
+        "name": "Whole Wheat Flour"
+      },
+      {
+        "amount": "1",
+        "unit": "tsp",
+        "name": "Baking Soda"
+      }
+    ],
+    "id": 1510246647598
   }
 ]
