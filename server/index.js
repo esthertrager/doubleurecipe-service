@@ -2,8 +2,9 @@ const express = require('express')
 const app = express()
 const fs = require('fs');
 const bodyParser = require('body-parser');
-
+const recipesModel = require('./recipes/model');
 const dataFile = 'recipes.json';
+
 
 app.use(bodyParser.json());
 app.use(function(req, res, next) {
@@ -13,77 +14,46 @@ app.use(function(req, res, next) {
   next();
 });
 
+const handleError = (error) => {
+	res.status(error.status).send(error.text)
+};
+
 app.get('/', function (req, res) {
-  res.send('Hello World!')
+  res.send({
+  	timestamp: Date.now()
+  });
 });
 
 app.get('/recipes', function (req, res) {
-	fs.readFile(dataFile, (err, data) => {
-	  if (err) throw err;
-	  res.send(JSON.parse(data));
-	});
+	recipesModel.get().then((recipes) => {
+		res.send(recipes);
+	}, handleError);
 });
 
 app.get('/recipes/:id', function (req, res) {
-	fs.readFile(dataFile, (err, data) => {
-	  if (err) throw err;
-	  const recipes = JSON.parse(data);
-	  const recipe = recipes.find((_recipe) => {
-	  	return _recipe.id === parseInt(req.params.id);
-	  });
-
-	  res.send(recipe);
-	});
+	recipesModel.findById(req.params.id).then((recipe) => {
+		res.send(recipe);
+	}, handleError);
 });
 
 app.post('/recipes', function (req, res) {
 	const recipe = req.body;
-	fs.readFile(dataFile, (err, data) => {
-	  if (err) throw err;
-	  const recipes = JSON.parse(data);
-	  const id = Date.now();
-	  recipe.id = id;
-	  recipes.push(recipe);
-	  fs.writeFile(dataFile, JSON.stringify(recipes, null, 2), (err) => {
-	  	if (err) throw err;
-	  	res.send(recipe);
-	  });
-	})
+	recipesModel.create(recipe).then((_recipe) => {
+		res.send(_recipe);
+	}, handleError);
 });
 
 app.put('/recipes/:id', function (req, res) {
 	const recipe = req.body;
-	fs.readFile(dataFile, (err, data) => {
-	  if (err) throw err;
-	  const recipes = JSON.parse(data);
-	  const id = parseInt(req.params.id);
-	  const index = recipes.findIndex((_recipe) => {
-	  	return _recipe.id === id;
-	  });
-	  recipes[index] = recipe;
-	  fs.writeFile(dataFile, JSON.stringify(recipes, null, 2), (err) => {
-	  	if (err) throw err;
-	  	res.send(recipe);
-	  });
-	})
+	recipesModel.update(recipe).then((_recipe) => {
+		res.send(_recipe);
+	}, handleError);
 });
 
 app.delete('/recipes/:id', function (req, res) {
-	fs.readFile(dataFile, (err, data) => {
-	  if (err) throw err;
-	  const recipes = JSON.parse(data);
-	  const id = parseInt(req.params.id);
-	  const index = recipes.findIndex((_recipe) => {
-	  	return _recipe.id === id;
-	  });
-	  console.log(`Found recipe with id = ${id} at index ${index}`);
-	  recipes.splice(index, 1);
-	  console.log(recipes);
-	  fs.writeFile(dataFile, JSON.stringify(recipes, null, 2), (err) => {
-	  	if (err) throw err;
-	  	res.send({});
-	  });
-	})
+	recipesModel.remove(req.params.id).then(() => {
+		res.send({});
+	}, handleError);
 });
 
 app.listen(3000, function () {

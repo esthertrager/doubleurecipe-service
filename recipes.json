@@ -1,16 +1,5 @@
 [
   {
-    "id": 0,
-    "name": "Challah",
-    "ingredients": [
-      {
-        "name": "eggs",
-        "amount": "3",
-        "unit": null
-      }
-    ]
-  },
-  {
     "id": 1,
     "name": "Sourdough",
     "ingredients": [
