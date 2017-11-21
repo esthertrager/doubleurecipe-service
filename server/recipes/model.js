@@ -1,13 +1,22 @@
 const mongoose = require('mongoose');
 
 var recipeSchema = mongoose.Schema({
+		createdDate: Date,
     name: String,
+    directions: {
+    	type: String,
+    	default: ''
+    },
     ingredients: {
     	type: Array,
     	default: []
     },
+    owner: {
+    	type: String,
+    	default: 'esther'
+    },
     total: {
-    	amount: {
+    	quantity: {
     		type: Number,
     		default: null
     	},
@@ -16,14 +25,7 @@ var recipeSchema = mongoose.Schema({
     		default: null
     	}
     },
-    directions: {
-    	type: String,
-    	default: ''
-    },
-    owner: {
-    	type: String,
-    	default: 'esther'
-    }
+    updatedDate: Date
 });
 
 const Recipe = mongoose.model('Recipe', recipeSchema);
@@ -47,8 +49,11 @@ const update = (recipe) => {
 
 	return new Promise((resolve, reject) => {
 		Recipe.findOneAndUpdate({_id}, { $set: {
+					directions: recipe.directions,
 					name: recipe.name,
-					ingredients: recipe.ingredients
+					ingredients: recipe.ingredients,
+					total: recipe.total,
+					updatedDate: Date.now()
 				}}, { new: true }, function(error, _recipe){
 	    if (error){
         console.log('Failed to query mongodb', error);
@@ -79,7 +84,10 @@ const remove = (_id) => {
 }
 
 const create = (_recipe) => {
+	_recipe.createdDate = Date.now();
+	_recipe.updatedDate = _recipe.createdDate;
 	const recipe = new Recipe(_recipe);
+
 	return new Promise((resolve, reject) => {
 		recipe.save((error, __recipe) => {
 			if (error) {
