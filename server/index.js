@@ -3,8 +3,7 @@ const app = express()
 const fs = require('fs');
 const bodyParser = require('body-parser');
 const recipesModel = require('./recipes/model');
-const dataFile = 'recipes.json';
-
+const mongooseConnect = require('./mongooseConnect');
 
 app.use(bodyParser.json());
 app.use(function(req, res, next) {
@@ -56,6 +55,8 @@ app.delete('/recipes/:id', function (req, res) {
 	}, handleError);
 });
 
-app.listen(3000, function () {
-  console.log('Example app listening on port 3000!');
-});
+mongooseConnect().then(() => {
+	app.listen(3000, function () {
+	  console.log('Example app listening on port 3000!');
+	});
+})

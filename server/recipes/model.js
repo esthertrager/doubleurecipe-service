@@ -1,97 +1,96 @@
-const mongoConnect = require('../mongoConnect');
-var ObjectId = require('mongodb').ObjectID;
+const mongoose = require('mongoose');
+
+var recipeSchema = mongoose.Schema({
+    name: String,
+    ingredients: {
+    	type: Array,
+    	default: []
+    },
+    total: {
+    	amount: {
+    		type: Number,
+    		default: null
+    	},
+    	unit: {
+    		type: String,
+    		default: null
+    	}
+    },
+    directions: {
+    	type: String,
+    	default: ''
+    },
+    owner: {
+    	type: String,
+    	default: 'esther'
+    }
+});
+
+const Recipe = mongoose.model('Recipe', recipeSchema);
+const getRecipeInstance = (recipe) => new Recipe(recipe).toJSON({ virtuals: true });
 
 const get = (query) => {
 	query = query || {};
 	return new Promise((resolve, reject) => {
-		mongoConnect().then((db) => {
-			db.collection('recipes').find(query, function(error, result) {
-					if (error) {
-						console.log('Failed to query mongodb', error);
-						resolve({});
-					}
-			    const recipes = result.map((recipe) => {
-			    	recipe.id = recipe._id;
-			    	return recipe;
-			    }).toArray((error, results) => {
-			    	if (error) {
-			    		console.log('Failed to convert evo beta recipes to array', error);
-			    		reject({
-								status: 500,
-								error
-							});
-			    	}
-
-			    	resolve(results);
-			    });
-			  });
+		Recipe.find(query || {}).exec((error, recipes) => {
+			resolve(recipes.map(getRecipeInstance));
 		});
 	});
 }
 
-const findById = (id) => {
-	return get({_id: id}).then(recipes => recipes[0])
+const findById = (_id) => {
+	return get({ _id }).then(recipes => recipes[0])
 }
 
 const update = (recipe) => {
-	const _id = new ObjectId(recipe._id);
+	const _id = recipe._id;
 
 	return new Promise((resolve, reject) => {
-		mongoConnect().then((db) => {
-			db.collection('recipes').updateOne({_id}, {$set: {
-				name: recipe.name,
-				ingredients: recipe.ingredients
-			}}, function(error, result) {
-					if (error) {
-						console.log('Failed to query mongodb', error);
-						reject({
-							status: 500,
-							error
-						});
-					}
-			    findById(_id).then((_recipe) => {
-			    	resolve(_recipe);
-			    });
-			  });
+		Recipe.findOneAndUpdate({_id}, { $set: {
+					name: recipe.name,
+					ingredients: recipe.ingredients
+				}}, { new: true }, function(error, _recipe){
+	    if (error){
+        console.log('Failed to query mongodb', error);
+				reject({
+					status: 500,
+					error
+				});
+			} else {
+				resolve(getRecipeInstance(_recipe));
+			}
 		});
 	});
 }
 
-const remove = (recipeId) => {
-	const _id = new ObjectId(recipeId);
-
+const remove = (_id) => {
 	return new Promise((resolve, reject) => {
-		mongoConnect().then((db) => {
-			db.collection('recipes').deleteOne({_id}, function(error, result) {
-					if (error) {
-						console.log('Failed to delete', recipe, error);
-						reject({
-							status: 500,
-							error
-						});
-					}
-			    resolve({})
-			  });
+		Recipe.remove({ _id }, function (error) {
+		  if (error) {
+		  	reject({
+					status: 500,
+					error
+				})
+		  } else {
+			  resolve({})
+		  }
 		});
 	});
 }
 
-const create = (recipe) => {
+const create = (_recipe) => {
+	const recipe = new Recipe(_recipe);
 	return new Promise((resolve, reject) => {
-		mongoConnect().then((db) => {
-			db.collection('recipes').insertOne(recipe, function(error, result) {
-					if (error) {
-						console.log('Failed to insert recipe', error);
-						reject({
-							status: 500,
-							error
-						});
-					}
-
-					const recipe = result.ops[0];
-					recipe.id = recipe._id;
-					resolve(recipe);
-			  });
+		recipe.save((error, __recipe) => {
+			if (error) {
+				console.log('Failed to insert recipe', error);
+				reject({
+					status: 500,
+					error
+				});
+			} else {
+				resolve(getRecipeInstance(__recipe));
+			}
 		});
 	});
 }
