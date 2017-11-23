@@ -2,7 +2,7 @@ const express = require('express')
 const app = express()
 const fs = require('fs');
 const bodyParser = require('body-parser');
-const recipesModel = require('./recipes/model');
+const recipeModel = require('./recipe/model');
 const mongooseConnect = require('./mongooseConnect');
 
 app.use(bodyParser.json());
@@ -24,33 +24,33 @@ app.get('/', function (req, res) {
 });
 
 app.get('/recipes', function (req, res) {
-	recipesModel.get().then((recipes) => {
+	recipeModel.get().then((recipes) => {
 		res.send(recipes);
 	}, handleError);
 });
 
 app.get('/recipes/:id', function (req, res) {
-	recipesModel.findById(req.params.id).then((recipe) => {
+	recipeModel.findById(req.params.id).then((recipe) => {
 		res.send(recipe);
 	}, handleError);
 });
 
 app.post('/recipes', function (req, res) {
 	const recipe = req.body;
-	recipesModel.create(recipe).then((_recipe) => {
+	recipeModel.create(recipe).then((_recipe) => {
 		res.send(_recipe);
 	}, handleError);
 });
 
 app.put('/recipes/:id', function (req, res) {
 	const recipe = req.body;
-	recipesModel.update(recipe).then((_recipe) => {
+	recipeModel.update(recipe).then((_recipe) => {
 		res.send(_recipe);
 	}, handleError);
 });
 
 app.delete('/recipes/:id', function (req, res) {
-	recipesModel.remove(req.params.id).then(() => {
+	recipeModel.remove(req.params.id).then(() => {
 		res.send({});
 	}, handleError);
 });
