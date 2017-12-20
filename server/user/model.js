@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 
 var userSchema = mongoose.Schema({
-    name: String,
-    googleId: String,
+    name: { type: String, index: { unique: true } },
+    googleId: { type: String, index: { unique: true } },
     email: String,
 		createdDate: Date
 });
@@ -61,10 +61,14 @@ const update = (user) => {
 				}}, { new: true }, function(error, _user){
 	    if (error){
         console.log('Failed to query mongodb', error);
-				reject({
-					status: 500,
-					error
-				});
+	    	if (error.code === 11000) {
+	    		error.status = 409;
+	    		error.text = 'Username exists.';
+	    	} else {
+	    		error.status = 500;
+	    		error.text = 'Failed to update user.'
+	    	}
+				reject(error);
 			} else {
 				resolve(new User(_user));
 			}

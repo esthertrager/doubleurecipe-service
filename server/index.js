@@ -38,11 +38,9 @@ passport.use(new GoogleStrategy({
     callbackURL: "http://127.0.0.1/auth/google/callback"
   },
   function(accessToken, refreshToken, profile, done) {
-
 		User.findOrCreate({ googleId: profile.id }).then(function (user) {
 		  return done(null, user);
 		});
-
   }
 ));
 
@@ -72,51 +70,78 @@ app.get('/recipes', function (req, res) {
 });
 
 app.get('/recipes/:id', function (req, res) {
-	recipeModel.findById(req.params.id).then((recipe) => {
-		res.send(recipe);
-	}, handleError(res));
-});
-
-app.post('/recipes', function (req, res) {
-	const recipe = req.body;
-	recipeModel.create(recipe).then((_recipe) => {
-		res.send(_recipe);
-	}, handleError(res));
-});
-
-app.get('/user', function (req, res) {
-  console.log(req.user, req.session);
-  User.get({_id: req.user._id}).then((user) => {
-    res.send(user);
+  recipeModel.findById(req.params.id).then((recipe) => {
+    res.send(recipe);
   }, handleError(res));
 });
 
-app.put('/users/:id', function (req, res) {
-  const user = req.body;
-  User.update(user).then((_user) => {
-    res.send(_user);
+app.post('/recipes', userIsAuthenticated, function (req, res) {
+  const recipe = req.body;
+  recipeModel.create(recipe).then((_recipe) => {
+    res.send(_recipe);
   }, handleError(res));
 });
 
-app.post('/users', function (req, res) {
-	const user = req.body;
-	console.log(req.user, req.session);
-	userModel.create(user).then((_user) => {
-		res.send(_user);
-	}, handleError(res));
-});
-
-app.put('/recipes/:id', function (req, res) {
+app.put('/recipes/:id', userIsAuthenticated, userOwnsRecipe, function (req, res) {
 	const recipe = req.body;
 	recipeModel.update(recipe).then((_recipe) => {
 		res.send(_recipe);
 	}, handleError(res));
 });
 
-app.delete('/recipes/:id', function (req, res) {
+function userIsAuthenticated(req, res, next) {
+  const user = req.user;
+  if (!user) {
+      return res.status(401).send('User is not signed in.');
+  } else {
+    next();
+  }
+}
+
+function userOwnsRecipe(req, res, next) {
+  const user = req.user;
+  recipeModel.findById(req.params.id).then((recipe) => {
+    if (recipe.owner === user.name) {
+      next();
+    } else {
+      res.status(403).send('User does not have permission to this recipe.');
+    }
+  });
+}
+
+function userOwnsUser(req, res, next) {
+  const user = req.user;
+  User.get({ _id: req.params.id }).then((_user) => {
+    if (_user._id == user._id) {
+      next();
+    } else {
+      res.status(403).send('User does not have permission to this recipe.');
+    }
+  });
+}
+
+app.delete('/recipes/:id', userIsAuthenticated, userOwnsRecipe, function (req, res) {
 	recipeModel.remove(req.params.id).then(() => {
 		res.send({});
 	}, handleError(res));
+});
+
+app.get('/users/current', function (req, res) {
+  console.log(req.user);
+  if (!req.user) {
+    res.status(204).send();
+  } else {
+    User.get({_id: req.user._id}).then((user) => {
+      res.send(user);
+    }, handleError(res));
+  }
+});
+
+app.put('/users/:id', userIsAuthenticated, userOwnsUser, function (req, res) {
+  const user = req.body;
+  User.update(user).then((_user) => {
+    res.send(_user);
+  }, handleError(res));
 });
 
 // GET /auth/google
@@ -147,6 +172,11 @@ app.get('/auth/google/callback',
       console.log('Auth callback failed', error);
     });
   });
+
+app.get('/auth/logout', function(req, res){
+  req.logout();
+  res.redirect('/');
+});
 
 mongooseConnect().then(() => {
 	app.listen(3000, function () {
