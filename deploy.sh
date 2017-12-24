@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
-rm doubleurecipe-service.tar.gz
+rm -rf dist
+mkdir dist
+cp -r server package.json dist/
+cd dist
+npm install --production
 gtar -cvzf doubleurecipe-service.tar.gz *
 scp doubleurecipe-service.tar.gz 192.34.60.247:/home/btrager/
 
