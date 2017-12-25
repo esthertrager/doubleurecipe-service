@@ -3,9 +3,10 @@
 rm -rf dist
 mkdir dist
 cp -r server package.json dist/
+cp .kukezerc-prod	dist/.kukezerc
 cd dist
 npm install --production
-gtar -cvzf doubleurecipe-service.tar.gz *
+gtar -cvzf doubleurecipe-service.tar.gz .
 scp doubleurecipe-service.tar.gz 192.34.60.247:/home/btrager/
 
 ssh 192.34.60.247 "rm -rf /opt/doubleurecipe-service/*

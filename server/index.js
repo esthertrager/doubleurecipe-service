@@ -7,6 +7,7 @@ const User = require('./user/model');
 const mongooseConnect = require('./mongooseConnect');
 const passport = require('passport');
 const cookieSession = require('cookie-session');
+const conf = require('./conf');
 
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
@@ -22,7 +23,7 @@ app.use(cookieSession({
   // Cookie Options
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }));
-
+console.log('conf', conf);
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(bodyParser.json());
@@ -35,7 +36,7 @@ app.use(function(req, res, next) {
 passport.use(new GoogleStrategy({
     clientID: '870268289655-9cjvpti3kas0e69aocdjevbp6133064f.apps.googleusercontent.com',
     clientSecret: 'OcACrKqTD76_YE1HMyq1hgYf',
-    callbackURL: "http://127.0.0.1/auth/google/callback"
+    callbackURL: `http://${conf.appDomain}/auth/google/callback`
   },
   function(accessToken, refreshToken, profile, done) {
 		User.findOrCreate({ googleId: profile.id }).then(function (user) {
