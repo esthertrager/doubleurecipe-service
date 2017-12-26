@@ -29,7 +29,9 @@ const get = (query) => {
 }
 
 const findById = (_id) => {
-	return get({ _id });
+	return get({ _id }).then((user) => user, (err) => {
+		return {};
+	});
 }
 
 const create = (_user) => {
@@ -87,5 +89,5 @@ const findOrCreate = (query) => {
 }
 
 module.exports = {
-	get, create, findOrCreate, update
+	get, findById, create, findOrCreate, update
 }

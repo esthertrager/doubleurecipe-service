@@ -46,11 +46,13 @@ passport.use(new GoogleStrategy({
 ));
 
 passport.serializeUser(function(user, done) {
-  done(null, user);
+  done(null, user._id);
 });
 
-passport.deserializeUser(function(user, done) {
-  done(null, user);
+passport.deserializeUser(function(id, done) {
+  User.findById(id).then((user) => {
+    done(null, user);
+  });
 });
 
 const handleError = (res) => (error) => {
@@ -102,7 +104,8 @@ function userIsAuthenticated(req, res, next) {
 function userOwnsRecipe(req, res, next) {
   const user = req.user;
   recipeModel.findById(req.params.id).then((recipe) => {
-    if (recipe.owner === user.name) {
+    console.log('userOwnsRecipe', recipe, user)
+    if (recipe.owner == user.name) {
       next();
     } else {
       res.status(403).send('User does not have permission to this recipe.');
@@ -112,11 +115,12 @@ function userOwnsRecipe(req, res, next) {
 
 function userOwnsUser(req, res, next) {
   const user = req.user;
+
   User.get({ _id: req.params.id }).then((_user) => {
-    if (_user._id == user._id) {
+    if (_user._id.toString() == user._id) {
       next();
     } else {
-      res.status(403).send('User does not have permission to this recipe.');
+      res.status(403).send('User does not have permission to this user.');
     }
   });
 }
