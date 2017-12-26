@@ -80,6 +80,7 @@ app.get('/recipes/:id', function (req, res) {
 
 app.post('/recipes', userIsAuthenticated, function (req, res) {
   const recipe = req.body;
+  recipe.owner = req.user._id;
   recipeModel.create(recipe).then((_recipe) => {
     res.send(_recipe);
   }, handleError(res));
@@ -104,8 +105,7 @@ function userIsAuthenticated(req, res, next) {
 function userOwnsRecipe(req, res, next) {
   const user = req.user;
   recipeModel.findById(req.params.id).then((recipe) => {
-    console.log('userOwnsRecipe', recipe, user)
-    if (recipe.owner == user.name) {
+    if (recipe.owner._id.toString() === user._id.toString()) {
       next();
     } else {
       res.status(403).send('User does not have permission to this recipe.');
@@ -117,7 +117,7 @@ function userOwnsUser(req, res, next) {
   const user = req.user;
 
   User.get({ _id: req.params.id }).then((_user) => {
-    if (_user._id.toString() == user._id) {
+    if (_user._id.toString() == user._id.toString()) {
       next();
     } else {
       res.status(403).send('User does not have permission to this user.');

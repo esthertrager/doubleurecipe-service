@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
 var recipeSchema = mongoose.Schema({
 		createdDate: Date,
@@ -12,8 +13,8 @@ var recipeSchema = mongoose.Schema({
     	default: []
     },
     owner: {
-    	type: String,
-    	default: 'esther'
+    	type: Schema.ObjectId,
+    	ref: 'User'
     },
     total: {
     	quantity: {
@@ -34,7 +35,10 @@ const getRecipeInstance = (recipe) => new Recipe(recipe).toJSON({ virtuals: true
 const get = (query) => {
 	query = query || {};
 	return new Promise((resolve, reject) => {
-		Recipe.find(query || {}).exec((error, recipes) => {
+		Recipe
+			.find(query || {})
+			.populate('owner')
+			.exec((error, recipes) => {
 			resolve(recipes.map(getRecipeInstance));
 		});
 	});
