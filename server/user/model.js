@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 var userSchema = mongoose.Schema({
     name: { type: String, index: { unique: true } },
     googleId: { type: String, index: { unique: true } },
+    facebookId: { type: String, index: { unique: true } },
     email: String,
 		createdDate: Date
 });

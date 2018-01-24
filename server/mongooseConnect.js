@@ -1,21 +1,22 @@
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://@127.0.0.1:27017/dur');
+const uri = 'mongodb://localhost/dur';
+const options = {
+  useMongoClient: true,
+  reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
+  reconnectInterval: 1000,
+  // If not connected, return errors immediately rather than waiting for reconnect
+  bufferMaxEntries: 0
+};
 
 const mongooseConnect = () => {
-  return new Promise((resolve, reject) => {
-
-    const db = mongoose.connection;
-    db.on('error', (error) => {
-      console.error('Failed to connect to mongo', error);
-      reject(error);
-    });
-
-    db.once('open', () => {
+  return mongoose.connect(uri).then(
+    () => {
       console.log('Connected to mongodb');
-      resolve({})
-    });
-  });
-  
+    },
+    (error) => {
+      console.error('Failed to connect to mongo', error);
+    }
+  );
 }
 
 module.exports = mongooseConnect;
