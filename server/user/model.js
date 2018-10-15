@@ -5,7 +5,7 @@ var userSchema = mongoose.Schema({
     googleId: { type: String, index: { unique: true } },
     facebookId: { type: String, index: { unique: true } },
     email: String,
-		createdDate: Date
+	createdDate: Date
 });
 	
 const User = mongoose.model('User', userSchema);
@@ -38,6 +38,7 @@ const findById = (_id) => {
 const create = (_user) => {
 	_user.createdDate = Date.now();
 	_user.updatedDate = _user.createdDate;
+	_user.name = Date.now();
 	const user = new User(_user);
 	return new Promise((resolve, reject) => {
 		user.save((error, __user) => {
@@ -56,22 +57,36 @@ const create = (_user) => {
 
 const update = (user) => {
 	const _id = user._id;
-
+	console.log("user", user);
 	return new Promise((resolve, reject) => {
-		User.findOneAndUpdate({_id}, { $set: {
+		if (user.name.length < 6) {
+			const error = {};
+			error.text = 'Username must be at least 6 characters.';
+			error.status = 412;
+			reject(error);
+
+			return;
+		}
+		User.findOneAndUpdate({_id}, { 
+			$set: {
 					name: user.name,
 					updatedDate: Date.now()
-				}}, { new: true }, function(error, _user){
-	    if (error){
-        console.log('Failed to query mongodb', error);
-	    	if (error.code === 11000) {
-	    		error.status = 409;
-	    		error.text = 'Username exists.';
-	    	} else {
-	    		error.status = 500;
-	    		error.text = 'Failed to update user.'
-	    	}
+				}
+			}, { new: true }, function(error, _user) {
+	    
+		    if (error) {
+	        	console.log('Failed to query mongodb', error);
+	        	
+		    	if (error.code === 11000) {
+		    		error.status = 409;
+		    		error.text = 'Username exists.';
+		    	} else {
+		    		error.status = 500;
+		    		error.text = 'Failed to update user.'
+		    	}
+				
 				reject(error);
+				
 			} else {
 				resolve(new User(_user));
 			}

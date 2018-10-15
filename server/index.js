@@ -41,6 +41,7 @@ passport.deserializeUser(function(id, done) {
 });
 
 const handleError = (res) => (error) => {
+  console.error(error);
 	res.status(error.status).send(error.text)
 };
 

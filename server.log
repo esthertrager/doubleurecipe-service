@@ -1,0 +1,4 @@
+conf { appDomain: '127.0.0.1', _: [] }
+(node:911) DeprecationWarning: `open()` is deprecated in mongoose >= 4.11.0, use `openUri()` instead, or set the `useMongoClient` option if using `connect()` or `createConnection()`. See http://mongoosejs.com/docs/connections.html#use-mongo-client
+Connected to mongodb
+Example app listening on port 3000!
