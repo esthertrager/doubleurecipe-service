@@ -26,8 +26,11 @@ var recipeSchema = mongoose.Schema({
     		default: null
     	}
     },
-    updatedDate: Date
+    updatedDate: Date,
+    url: String
 });
+
+recipeSchema.index({ name: 1, url: 1 });
 
 const Recipe = mongoose.model('Recipe', recipeSchema);
 const getRecipeInstance = (recipe) => new Recipe(recipe).toJSON({ virtuals: true });
@@ -90,6 +93,8 @@ const remove = (_id) => {
 const create = (_recipe) => {
 	_recipe.createdDate = Date.now();
 	_recipe.updatedDate = _recipe.createdDate;
+	_recipe.url = _recipe.name;
+	_recipe.url = _recipe.url.replace(/\s+/g, '-').toLowerCase();
 	const recipe = new Recipe(_recipe);
 
 	return new Promise((resolve, reject) => {

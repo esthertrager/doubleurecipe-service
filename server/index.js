@@ -67,6 +67,12 @@ app.get('/recipes/:id', function (req, res) {
   }, handleError(res));
 });
 
+app.get('/recipes/:owner/:recipe.name', function (req, res) {
+  recipeModel.findById(req.params.id).then((recipe) => {
+    res.send(recipe);
+  }, handleError(res));
+});
+
 app.post('/recipes', userIsAuthenticated, function (req, res) {
   const recipe = req.body;
   recipe.owner = req.user._id;
