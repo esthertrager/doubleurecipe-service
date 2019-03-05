@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 var recipeSchema = mongoose.Schema({
-		createdDate: Date,
+	createdDate: Date,
     name: String,
     directions: {
     	type: String,
@@ -69,7 +69,7 @@ const update = (recipe) => {
 					error
 				});
 			} else {
-				resolve(getRecipeInstance(_recipe));
+				findById(_recipe._id).then(resolve);
 			}
 		});
 	});
@@ -106,7 +106,7 @@ const create = (_recipe) => {
 					error
 				});
 			} else {
-				resolve(getRecipeInstance(__recipe));
+				findById(__recipe._id).then(resolve);
 			}
 		});
 	});
