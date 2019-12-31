@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node server/index.js"
   },
   "author": "",
   "license": "ISC",
@@ -14,8 +14,8 @@
     "express": "^4.16.2",
     "mongoose": "^4.13.4",
     "passport": "^0.4.0",
-    "passport-facebook": "^2.1.1",
-    "passport-google-oauth": "^1.0.0",
+    "passport-facebook": "^3.0.0",
+    "passport-google-oauth": "^2.0.0",
     "rc": "^1.2.2"
   }
 }
